@@ -49,7 +49,7 @@ resolve_full_httpd () {
 	*apache2*|*lighttpd*|*httpd*)
 		# yes, *httpd* covers *lighttpd* above, but it is there for clarity
 		# ensure that the apache2/lighttpd command ends with "-f"
-		if ! echo "$httpd" | grep -- '-f *$' >/dev/null 2>&1
+		if ! echo "$httpd" >&1 && grep -- '-f *$' >/dev/null - 2>&1
 		then
 			httpd="$httpd -f"
 		fi
@@ -399,12 +399,12 @@ EOF
 		# plain-old CGI
 		resolve_full_httpd
 		list_mods=$(echo "$full_httpd" | sed 's/-f$/-l/')
-		$list_mods | grep 'mod_cgi\.c' >/dev/null 2>&1 || \
+		$list_mods >&1 && grep 'mod_cgi\.c' - >/dev/null 2>&1 || \
 		if test -f "$module_path/mod_cgi.so"
 		then
 			echo "LoadModule cgi_module $module_path/mod_cgi.so" >> "$conf"
 		else
-			$list_mods | grep 'mod_cgid\.c' >/dev/null 2>&1 || \
+			$list_mods >&1 && grep 'mod_cgid\.c' - >/dev/null 2>&1 || \
 			if test -f "$module_path/mod_cgid.so"
 			then
 				echo "LoadModule cgid_module $module_path/mod_cgid.so" \

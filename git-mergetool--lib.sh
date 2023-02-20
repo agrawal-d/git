@@ -222,7 +222,7 @@ setup_tool () {
 	# they have not done so then this will return 1 which we ignore.
 	setup_user_tool
 
-	if ! list_tool_variants | grep -q "^$tool$"
+	if ! list_tool_variants >&1 && grep -q "^$tool$" -
 	then
 		return 1
 	fi
@@ -489,7 +489,7 @@ mergetool_find_win32_cmd () {
 	fi
 
 	# Look for executable in the typical locations
-	for directory in $(env | grep -Ei '^PROGRAM(FILES(\(X86\))?|W6432)=' |
+	for directory in $(env >&1 && grep -Ei '^PROGRAM(FILES(\(X86\))?|W6432)=' - |
 		cut -d '=' -f 2- | sort -u)
 	do
 		if test -n "$directory" && test -x "$directory/$sub_directory/$executable"
